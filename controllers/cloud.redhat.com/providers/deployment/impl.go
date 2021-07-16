@@ -1,6 +1,7 @@
 package deployment
 
 import (
+	"fmt"
 	"strconv"
 
 	crd "cloud.redhat.com/clowder/v2/apis/cloud.redhat.com/v1alpha1"
@@ -41,6 +42,7 @@ func initDeployment(app *crd.ClowdApp, env *crd.ClowdEnvironment, d *apps.Deploy
 	if env.Spec.Providers.AuthSidecar && (deployment.WebServices.Public.Enabled || bool(deployment.Web)) {
 		d.Spec.Template.Annotations["authsidecar"] = "enabled"
 		d.Spec.Template.Annotations["authsidecar/port"] = strconv.Itoa(int(env.Spec.Providers.Web.Port))
+		d.Spec.Template.Annotations["authsidecar/config"] = fmt.Sprintf("%s/%s", env.GetClowdNamespace(), "caddy-config")
 	}
 	d.Spec.Replicas = deployment.MinReplicas
 	d.Spec.Selector = &metav1.LabelSelector{MatchLabels: labels}
